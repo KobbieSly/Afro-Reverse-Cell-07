@@ -1,1 +1,1 @@
-All objects/models used in the level will be kept here
+Obstacles the player will jumb over or slide under will be kept here
