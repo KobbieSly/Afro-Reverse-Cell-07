@@ -2,65 +2,63 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerController : MonoBehaviour
+public class PlayerControl : MonoBehaviour
 {
-    private Rigidbody playerRb;
-    public float jumpForce = 10;
-    public float gravityModifier;
-    public float speed = 15.0f;
-    public bool isOnGround = true;
-    public bool gameOver = false;
-    private Animator playerAnim;
-    public ParticleSystem explosionParticle;
-    public ParticleSystem dirtParticle;
-    public AudioClip jumpSound;
-    public AudioClip crashSound;
-    private AudioSource playerAudio;*/
+    private Rigidbody rb;
+    public float playerSpeed = 10;
+    private SwipeControls swipeLogic;
+    private bool isOnGround = false;
+    public float jumpForce = 20;
+    public GameObject graphics;
+    private Animator anims;
     // Start is called before the first frame update
     void Start()
     {
-        playerRb = GetComponent<Rigidbody>();
-        Physics.gravity *= gravityModifier;
-        playerAnim = GetComponent<Animator>();
-        playerAudio = GetComponent<AudioSource>();
-        
+        anims = graphics.GetComponent<Animator>();
+        anims.SetBool("isRunning", true);
+        anims.SetBool("isJumping", true);
+        swipeLogic = (SwipeControls)transform.GetComponent(typeof(SwipeControls));
+        rb = GetComponent<Rigidbody>();
+    }
+
+    private void FixedUpdate()
+    {
+        gameObject.transform.Translate(Vector3.left * playerSpeed * Time.fixedDeltaTime);
     }
 
     // Update is called once per frame
     void Update()
     {
-        //jump movement
-        if (Input.GetKeyDown(KeyCode.Space) && isOnGround && !gameOver) {
-            playerRb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
-            isOnGround = false;
-            playerAnim.SetTrigger("Jump_trig");
-            dirtParticle.Stop();
-            playerAudio.PlayOneShot(jumpSound, 1.0f);
-        }
-        //horizontal movement
+        swipeControls();
+    }
 
-        horizontalInput = Input.GetAxis("Horizontal");
-        transform.Translate(Vector3.right * Time.deltaTime * horizontalInput * speed);
+    public void swipeControls()
+    {
+        var direction = swipeLogic.getSwipeDirection();
+        if (isOnGround = true && direction == SwipeControls.SwipeDirection.Jump)
+        {
+            isOnGround = false;
+            rb.velocity = new Vector3(0, jumpForce, 0);
+            //Gravity Scale in Unity Rigibdody Component should be set to 5
+        }else if (isOnGround = true && direction == SwipeControls.SwipeDirection.Duck)
+        {
+            GetComponent<CircleCollider2D>().enabled = false;
+            Invoke("Up", 3);
+            anims.SetBool("isSliding", true);
+        }
+    }
+
+    public void Up()
+    {
+        GetComponent<CircleCollider2D>().enabled = true;
+        anims.SetBool("isSliding", false);
     }
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.CompareTag("ground"))
+        if(collision.gameObject.tag == "Ground")
         {
             isOnGround = true;
-            dirtParticle.Play();
+            anims.SetBool("isJumping", false);
         }
-        else if (collision.gameObject.CompareTag("barrier"))
-        {
-            dirtParticle.Stop();
-            
-            gameOver = true;
-            Debug.Log("Game Over");
-            playerAnim.SetBool("Death_b", true);
-            playerAnim.SetInteger("DeathType_int", 1);
-            explosionParticle.Play();
-            playerAudio.PlayOneShot(crashSound, 1.0f);
-        }
-        
-
     }
 }
