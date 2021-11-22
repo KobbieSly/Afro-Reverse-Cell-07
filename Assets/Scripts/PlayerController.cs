@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerControl : MonoBehaviour
+public class PlayerController : MonoBehaviour
 {
     private Rigidbody rb;
     public float playerSpeed = 10;
@@ -11,6 +11,7 @@ public class PlayerControl : MonoBehaviour
     public float jumpForce = 20;
     public GameObject graphics;
     private Animator anims;
+    public float gravityModifier;
     // Start is called before the first frame update
     void Start()
     {
@@ -19,6 +20,7 @@ public class PlayerControl : MonoBehaviour
         anims.SetBool("isJumping", true);
         swipeLogic = (SwipeControls)transform.GetComponent(typeof(SwipeControls));
         rb = GetComponent<Rigidbody>();
+        Physics.gravity *= gravityModifier;
     }
 
     private void FixedUpdate()
