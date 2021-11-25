@@ -4,9 +4,11 @@ using UnityEngine;
 
 public class PlayerController2 : MonoBehaviour
 {
-    private Rigidbody playerRB;
-    private Animator playerAmin;
+    private Rigidbody playerRB;    
+    private Collider playerColl;
 
+    public Animator playerAmin;
+    public GameObject WinLevelPanel;
     public float jumpforce = 5;
     public float gravityModifier = 1.5f;
 
@@ -21,10 +23,13 @@ public class PlayerController2 : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        //transform.position = new Vector3(30, 0.2f, 2.2f);
         playerRB = GetComponent<Rigidbody>();
         playerAmin = GetComponent<Animator>();
+        playerColl = GetComponent<Collider>();
 
         Physics.gravity *= gravityModifier;
+        WinLevelPanel.SetActive(false);
 
         // Player keeps rotating. This sae the initial direction the player is in
         playerRotaion = transform.rotation;
@@ -61,15 +66,24 @@ public class PlayerController2 : MonoBehaviour
             isOnGround = true;
             
         }
-       /* else if (collision.gameObject.CompareTag("obstacle"))
+        else if (collision.gameObject.CompareTag("death"))
         {
 
             Gameover = true;
-            //playerAmin.SetBool("Death_b", true);
-            //playerAmin.SetInteger("DeathType_int", 1);
+            
 
             Debug.Log("Game Over");
-        }*/
+        }
+
+        if (collision.gameObject.CompareTag("WinCon"))
+        {
+            
+            StartCoroutine(EnterRiver());            
+            Gameover = true;
+            StartCoroutine(FinishLevel());
+        }
+
+
     }
 
 
@@ -100,5 +114,23 @@ public class PlayerController2 : MonoBehaviour
         }
 
 
+    }
+
+    IEnumerator EnterRiver()
+    {
+        playerAmin.SetBool("reachRiver", true);
+        
+        yield return new WaitForSeconds(0.2f);        
+        playerColl.enabled = !playerColl.enabled;
+
+        
+
+    }
+
+    IEnumerator FinishLevel()
+    {
+        yield return new WaitForSeconds(2);
+        Time.timeScale = 0;
+        WinLevelPanel.SetActive(true);
     }
 }

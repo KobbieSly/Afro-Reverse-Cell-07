@@ -6,6 +6,7 @@ public class FollowPlayer : MonoBehaviour
 {
 
     public Transform target;
+    public GameObject Player;
     public float smoothSpeed = 0.04f;
     private Vector3 offset;
 
@@ -17,7 +18,15 @@ public class FollowPlayer : MonoBehaviour
     // Update is called once per frame
     void LateUpdate()
     {
-        Vector3 newPosition = Vector3.Lerp(transform.position, target.position + offset, smoothSpeed);
-        transform.position = newPosition;
+
+        if (!Player.GetComponent<PlayerController2>().playerAmin.GetBool("reachRiver"))
+        {
+            Vector3 newPosition = Vector3.Lerp(transform.position, target.position + offset, smoothSpeed);
+            transform.position = newPosition;
+
+        }
+            
+
+    
     }
 }
